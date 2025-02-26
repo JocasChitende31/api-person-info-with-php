@@ -12,13 +12,13 @@ class ParentsController
     private $requestMethod;
     private $parentsGateway;
 
-    public function __construct($db, $parentId, $requestMethod)
+    public function __construct($db, $requestMethod, $parentId)
     {
         $this->db = $db;
-        $this->parentId = $parentId;
         $this->requestMethod = $requestMethod;
+        $this->parentId = $parentId;
 
-        $this->parentsGateway = new ParentsGateways($this->$db);
+        $this->parentsGateway = new ParentsGateways($this->db);
     }
     public function processRequest()
     {
@@ -28,7 +28,7 @@ class ParentsController
                 $this->parentId ? $response = $this->getParent($this->parentId) : $response = $this->getAllParents();
                 break;
             case 'POST':
-                $repsone = $this->createParentFromRequest();
+                $response = $this->createParentFromRequest();
                 break;
             case 'PUT':
                 $response = $this->updateParentFromRequest($this->parentId);
@@ -37,10 +37,10 @@ class ParentsController
                 $response = $this->deleteParent($this->parentId);
                 break;
             default;
-                $reponse = $this->notFoundResponse();
+                $response = $this->notFoundResponse();
                 break;
         }
-        header($repsone['status_code_header']);
+        header($response['status_code_header']);
         if ($response['body']) {
             echo $response['body'];
         }

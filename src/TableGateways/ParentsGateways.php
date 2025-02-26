@@ -13,13 +13,7 @@ class ParentsGateways
 
     public function findAll()
     {
-        $statement = "
-            SELECT 
-            *
-            FROM
-            parents
-        ";
-
+        $statement = " SELECT * FROM parents";
         try {
             $query = $this->db->query($statement);
             $result = $query->fetchAll(\PDO::FETCH_ASSOC);
