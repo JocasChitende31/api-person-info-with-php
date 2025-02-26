@@ -1,70 +1,74 @@
 <?php
+
 namespace Src\TableGateways;
 
-class PersonGateways {
+class PersonGateways
+{
     private $db = null;
-    public function __constructor($db){
+    public function __construct($db)
+    {
         $this->db = $db;
     }
 
-    public function findAll(){
+    public function findAll()
+    {
         $statement = "
-        SELECT 
-            *
+        SELECT  
+        * 
         FROM 
-            person;
-        ";
+        person";
 
-        try{
+        echo "FindAll method";
+        try {
             $statement = $this->db->query($statement);
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
             return $result;
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             exit($e->getMessage());
         }
     }
-    public function findById($id){
-        $statement = "
-        SELECT 
-            *
-        FROM
-            person
-        WHERE id LIKE ?;
+    public function findById($id)
+    {
+        $statement = "SELECT * FROM person WHERE id LIKE ?
         ";
 
-        try{
+        try {
             $statement = $this->db->prepare($statement);
             $statement->execute(array($id));
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
             return $result;
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             exit($e->getMessage());
         }
     }
 
-    public function insert( array $person){
+    public function insert(array $person)
+    {
+        var_dump($person);
         $statement = "
         INSERT INTO person 
             (firstname, lastname, email, firstparent_id, secondparent_id)
         VALUES ( :firstname, :lastname, :email, :firstparent_id, :secondparent_id );
         ";
 
-        try{
+        try {
             $statement = $this->db->prepare($statement);
-            $statement->execute(array(
+            $statement->execute([
                 'firstname' => $person['firstname'],
-                'lastname' => $person('lastname'),
-                'eamil' => $person['email'],
+                'lastname' => $person['lastname'],
+                'email' => $person['email'],
                 'firstparent_id' => $person['firstparent_id'] ?? null,
                 'secondparent_id' => $person['secondparent_id'] ?? null,
-            ));
+            ]);
             return $statement->rowCount();
-        }catch(\PDOException $e){
-            exit($e->getMessage());
+        } catch (\PDOException $e) {
+            error_log($e->getMessage());
+            throw new \Exception('Erro ao inserir no banco de dados!');
         }
     }
 
-    public function update($id, array $person){
+    public function update($id, array $person)
+    {
         $statement = "
         UPDATE person
         SET
@@ -76,32 +80,33 @@ class PersonGateways {
         WHERE id = :id;
         ";
 
-        try{
+        try {
             $statement = $this->db->prepare($statement);
             $statement->execute(array(
-            'id' => (int) $id,
-            'firstname' => $person['firstname'],
-            'lastname' => $person['lastname'],
-            'email' => $person['email'],
-            'firstparent_id' => $person['firstparent_id']?? null,
-            'secondparent_id' => $person['secondparent_id']?? null,
-            
+                'id' => (int) $id,
+                'firstname' => $person['firstname'],
+                'lastname' => $person['lastname'],
+                'email' => $person['email'],
+                'firstparent_id' => $person['firstparent_id'] ?? null,
+                'secondparent_id' => $person['secondparent_id'] ?? null,
+
             ));
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             exit($e->getMessage());
         }
     }
-    public function delete($id){
+    public function delete($id)
+    {
         $statement = "
         DELETE FROM person
         WHERE id = :id
         ";
 
-        try{
+        try {
             $statement = $this->db->prepare($statement);
-            $statement->execute(array('id'=> (int) $id));
+            $statement->execute(array('id' => (int) $id));
             return $statement->rowCount();
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             exit($e->getMessage());
         }
     }

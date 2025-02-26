@@ -2,29 +2,32 @@
 
 namespace Src\System;
 
-class DatabaseConnector {
-    
+class DatabaseConnector
+{
+
     private $dbConnection = null;
 
-    public function _constructor() {
-        $host = getenv('DB_HOST');
-        $port = getenv('DB_PORT');
-        $db = getenv('DB_DATABASE');
-        $user = getenv('DB_USERNAME');
-        $pass = getenv('DB_PASSWORD');
+    public function __construct()
+    {
+        $host = '127.0.0.1';
+        $port = '3306';
+        $db   = 'api_php_test';
+        $user = 'orbita_user';
+        $pass = 'Orbita123';
 
-        try {   
+        try {
             $this->dbConnection = new \PDO(
-                "mysql:host=$host;port=$port;charset=utf8mb4;dbname:$db;",
+                "mysql:host=$host;port=$port;charset=utf8mb4;dbname=$db",
                 $user,
                 $pass
             );
-        }catch(\PDOException $e){
+        } catch (\PDOException $e) {
             exit($e->getMessage());
         }
     }
 
-    public function getConnection() {
+    public function getConnection()
+    {
         return $this->dbConnection;
     }
 }

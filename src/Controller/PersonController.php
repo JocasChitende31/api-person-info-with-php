@@ -4,28 +4,27 @@ namespace Src\Controller;
 
 use Src\TableGateways\PersonGateways;
 
-class PersonController{
+class PersonController
+{
 
     private $db;
     private $requestMethod;
     private $userId;
     private $personGateway;
-    public function __construct($db, $requestMethod, $userId){
+    public function __construct($db, $requestMethod, $userId)
+    {
         $this->db = $db;
         $this->requestMethod = $requestMethod;
         $this->userId = $userId;
-        
+
         $this->personGateway = new PersonGateways($this->db);
     }
 
-    public function processRequest(){
-        switch ($this->requestMethod){
+    public function processRequest()
+    {
+        switch ($this->requestMethod) {
             case 'GET':
-                if($this->userId){
-                    $response = $this->getUser($this->userId);
-                }else{
-                    $response = $this->getAllUsers();
-                }
+                $this->userId ? $response = $this->getUser($this->userId) : $response = $this->getAllUsers();
                 break;
             case 'POST':
                 $response = $this->createUserFromRequest();
@@ -42,45 +41,50 @@ class PersonController{
         }
 
         header($response['status_code_header']);
-        if($response['body']){
+        if ($response['body']) {
             echo $response['body'];
         }
     }
-    private function getUser($userId): mixed{
+    private function getUser($userId): mixed
+    {
         $result = $this->personGateway->findById($userId);
-        if(!$result){
+        if (!$result) {
             return $this->notFoundResponse();
         }
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body']               = json_encode($result);
         return $response;
     }
-    private function getAllUsers():mixed{
+    private function getAllUsers(): mixed
+    {
         $result = $this->personGateway->findAll();
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = json_encode($result);
         return $response;
     }
-    
-    private function createUserFromRequest():mixed{
-        $person = (array) json_decode(file_get_contents('php://person'), TRUE);
-        if(!$this->validatePerson($person)){
+
+    private function createUserFromRequest(): mixed
+    {
+        $input = (array) json_decode(file_get_contents('php://input'), TRUE);
+
+        var_dump($input);
+        if (!$this->validatePerson($input)) {
             return $this->unprocessableEntityResponse();
         }
-        $this->personGateway->insert($person);
+        $this->personGateway->insert($input);
         $response['status_code_header'] = 'HPPT/1.1 201 CREATED';
         $response['body'] = null;
         return $response;
-
     }
-    private function updateUserFromRequest($id):mixed{
+    private function updateUserFromRequest($id): mixed
+    {
 
         $restult = $this->personGateway->findById($id);
-        if(!$restult){
+        if (!$restult) {
             return $this->notFoundResponse();
         }
-        $person = (array) json_decode(file_get_contents('php://person'), TRUE);
-        if(!$this->validatePerson($person)){
+        $person = (array) json_decode(file_get_contents('php://input'), TRUE);
+        if (!$this->validatePerson($person)) {
             return $this->unprocessableEntityResponse();
         }
         $this->personGateway->update($id, $person);
@@ -88,9 +92,10 @@ class PersonController{
         $response['body'] = null;
         return $response;
     }
-    private function deleteUser($id):mixed{
+    private function deleteUser($id): mixed
+    {
         $result = $this->personGateway->delete($id);
-        if(!$result){
+        if (!$result) {
             return $this->notFoundResponse();
         }
         $this->personGateway->delete($id);
@@ -99,29 +104,32 @@ class PersonController{
         return $response;
     }
 
-    private function validatePerson(array $person):bool{
-        if(isset($person['firstname'])){
+    private function validatePerson(array $person): bool
+    {
+        if (isset($person['firstname'])) {
             return false;
         }
 
-        if(!isset($person['lastname'])){
+        if (!isset($person['lastname'])) {
             return false;
         }
 
-        if(!isset($person['email'])){
+        if (!isset($person['email'])) {
             return false;
         }
         return true;
     }
 
-    private function unprocessableEntityResponse():array{
+    private function unprocessableEntityResponse(): array
+    {
         $response['status_code_header'] = 'HTTP/1.1 402 Unprocessable Entity';
         $response['body'] = json_encode([
             'error' => 'Invalid Input',
         ]);
         return $response;
     }
-    private function notFoundResponse(): array{
+    private function notFoundResponse(): array
+    {
         $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
         $response['body'] = null;
         return $response;
