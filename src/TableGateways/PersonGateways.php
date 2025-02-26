@@ -34,7 +34,7 @@ class PersonGateways
 
         try {
             $statement = $this->db->prepare($statement);
-            $statement->execute(array($id));
+            $statement->execute([$id]);
             $result = $statement->fetchAll(\PDO::FETCH_ASSOC);
             return $result;
         } catch (\PDOException $e) {
@@ -105,7 +105,7 @@ class PersonGateways
 
         try {
             $statement = $this->db->prepare($statement);
-            $statement->execute(array('id' => (int) $id));
+            $statement->execute(['id' => (int) $id]);
             return $statement->rowCount();
         } catch (\PDOException $e) {
             exit($e->getMessage());

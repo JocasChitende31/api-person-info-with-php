@@ -68,9 +68,6 @@ class PersonController
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
 
         if (!$this->validatePerson($input)) {
-            // echo "Validação falhou! Input recebido:\n";
-            // print_r($input);
-            // exit();
             return $this->unprocessableEntityResponse();
         }
 
