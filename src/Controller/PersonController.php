@@ -67,13 +67,16 @@ class PersonController
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
 
-        var_dump($input);
         if (!$this->validatePerson($input)) {
+            // echo "Validação falhou! Input recebido:\n";
+            // print_r($input);
+            // exit();
             return $this->unprocessableEntityResponse();
         }
+
         $this->personGateway->insert($input);
-        $response['status_code_header'] = 'HPPT/1.1 201 CREATED';
-        $response['body'] = null;
+        $response['status_code_header'] = 'HTTP/1.1 201 Created';
+        $response['body']               = null;
         return $response;
     }
     private function updateUserFromRequest($id): mixed
@@ -106,15 +109,10 @@ class PersonController
 
     private function validatePerson(array $person): bool
     {
-        if (isset($person['firstname'])) {
+        if (empty($person['firstname']) || empty($person['lastname']) || empty($person['email'])) {
             return false;
         }
-
-        if (!isset($person['lastname'])) {
-            return false;
-        }
-
-        if (!isset($person['email'])) {
+        if (!filter_var($person['email'], FILTER_VALIDATE_EMAIL)) {
             return false;
         }
         return true;

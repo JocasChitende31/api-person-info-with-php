@@ -42,25 +42,26 @@ class PersonGateways
         }
     }
 
-    public function insert(array $person)
+    public function insert(array $input)
     {
-        var_dump($person);
-        $statement = "
-        INSERT INTO person 
-            (firstname, lastname, email, firstparent_id, secondparent_id)
-        VALUES ( :firstname, :lastname, :email, :firstparent_id, :secondparent_id );
+        $statement = "INSERT INTO person(firstname, lastname, email, firstparent_id, secondparent_id)
+        VALUES (:firstname, :lastname, :email, :firstparent_id, :secondparent_id)
         ";
-
         try {
-            $statement = $this->db->prepare($statement);
-            $statement->execute([
-                'firstname' => $person['firstname'],
-                'lastname' => $person['lastname'],
-                'email' => $person['email'],
-                'firstparent_id' => $person['firstparent_id'] ?? null,
-                'secondparent_id' => $person['secondparent_id'] ?? null,
+            $query = $this->db->prepare($statement);
+            $executed = $query->execute([
+                'firstname' => $input['firstname'],
+                'lastname' => $input['lastname'],
+                'email' => $input['email'],
+                'firstparent_id' => $input['firstparent_id'] ?? null,
+                'secondparent_id' => $input['secondparent_id'] ?? null,
             ]);
-            return $statement->rowCount();
+            if (!$executed) {
+                echo "SQL Error: ";
+                print_r($query->errorInfo()); // 🔴 Exibe erro SQL detalhado
+                exit();
+            }
+            return $query->rowCount();
         } catch (\PDOException $e) {
             error_log($e->getMessage());
             throw new \Exception('Erro ao inserir no banco de dados!');
@@ -76,13 +77,13 @@ class PersonGateways
         lastname = :lastname,
         email = :email,
         firstparent_id = :firstparent_id,
-        secondparent_id = :secondparent_id,
-        WHERE id = :id;
+        secondparent_id = :secondparent_id
+        WHERE id = :id
         ";
 
         try {
             $statement = $this->db->prepare($statement);
-            $statement->execute(array(
+            $statement->execute([
                 'id' => (int) $id,
                 'firstname' => $person['firstname'],
                 'lastname' => $person['lastname'],
@@ -90,7 +91,7 @@ class PersonGateways
                 'firstparent_id' => $person['firstparent_id'] ?? null,
                 'secondparent_id' => $person['secondparent_id'] ?? null,
 
-            ));
+            ]);
         } catch (\PDOException $e) {
             exit($e->getMessage());
         }
