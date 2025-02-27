@@ -73,9 +73,9 @@ class ParentsController
         $response['body'] = null;
         return $response;
     }
-    private function updateParentFromRequest($parentId): mixed
+    private function updateParentFromRequest($id): mixed
     {
-        $result = $this->parentsGateway->findById($parentId);
+        $result = $this->parentsGateway->findById($id);
         if (!$result) {
             return $this->notFoundResponse();
         }
@@ -83,18 +83,18 @@ class ParentsController
         if (!$this->validateParent($input)) {
             return $this->unprocessableEntityResponse();
         }
-        $this->parentsGateway->update($parentId, $input);
-        $response['satatus_code_header'] = 'HTTP/1.1 200 OK';
+        $this->parentsGateway->update($id, $input);
+        $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
     }
-    private function deleteParent($parentId): mixed
+    private function deleteParent($id): mixed
     {
-        $result = $this->parentsGateway->findById($parentId);
+        $result = $this->parentsGateway->findById($id);
         if (!$result) {
             return $this->notFoundResponse();
         }
-        $this->parentsGateway->delete($parentId);
+        $this->parentsGateway->delete($id);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;

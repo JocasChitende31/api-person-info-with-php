@@ -69,7 +69,7 @@ class ParentsGateways
             SET 
             firstname = :firstname,
             lastname = :lastname,
-            number_children = :number_children,
+            number_children = :number_children
             WHERE id = :id
         ";
 
@@ -81,7 +81,6 @@ class ParentsGateways
                 'lastname' => $parents['lastname'],
                 'number_children' => $parents['number_children']
             ]);
-            return $query->rowCount();
         } catch (\PDOException $e) {
             exit($e->getMessage());
         }
@@ -91,7 +90,6 @@ class ParentsGateways
     {
         $statement = "
         DELETE 
-        * 
         FROM
          parents 
          WHERE id = :id
